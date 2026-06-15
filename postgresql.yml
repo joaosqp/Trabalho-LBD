@@ -1,0 +1,21 @@
+# Use postgres/example user/password credentials
+
+services:
+  postgresql:
+    container_name: 'meucontainer'
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: minhasenha
+      POSTGRES_DB: banco_trabalho
+    ports:
+      - "5433:5432"
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "seuemail@email.com"
+      PGADMIN_DEFAULT_PASSWORD: "senha1"
+    ports:
+      - "8090:80"
+    depends_on:
+      - postgresql
