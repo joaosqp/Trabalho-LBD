@@ -53,11 +53,11 @@ def preparar_dados_iniciais():
     execute_values(
         cursor,
         """
-        INSERT INTO ativos (id, nome, eh_moeda_cotacao)
+        INSERT INTO ativos (id, nome)
         VALUES %s
         ON CONFLICT (id) DO NOTHING
         """,
-        [(codigo, nome, False) for codigo, nome, _ in ATIVOS],
+        [(codigo, nome) for codigo, nome, _ in ATIVOS],
     )
 
     cursor.execute(
@@ -86,10 +86,10 @@ def preparar_dados_iniciais():
 
     carteiras = []
     for usuario_id in usuarios:
-        carteiras.append((usuario_id, "BRL", "1000000000.00000000", "0.00000000"))
+        carteiras.append((usuario_id, "BRL", "1000000000000.00000000", "0.00000000"))
 
         for codigo, _, _ in ATIVOS:
-            carteiras.append((usuario_id, codigo, "100000.00000000", "0.00000000"))
+            carteiras.append((usuario_id, codigo, "1000000000.00000000", "0.00000000"))
 
     execute_values(
         cursor,

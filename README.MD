@@ -3,7 +3,7 @@
 Alunos:
 
 - Joao Pedro de Souza Quintino de Paula - RGA: 202019060598
-- Analia - RGA: 202119060751
+- Anália Beatriz Ferreira da Cruz- RGA: 202119060751
 
 ## Como executar
 
@@ -31,6 +31,10 @@ python trabalho.py
 python popular_dados.py
 ```
 
+O arquivo `dump_banco.sql` tambem pode ser entregue/importado diretamente para
+criar as tabelas, funcoes, triggers e views. O `trabalho.py` apenas executa esse
+dump no banco configurado. Ao rodar o dump, as tabelas do trabalho sao recriadas.
+
 O gerador usa 4 processos, faz insercoes em lote, gera pequenas variacoes de
 preco a partir do preco anterior e para quando o banco atinge o volume definido
 no inicio do arquivo.
@@ -45,6 +49,12 @@ no inicio do arquivo.
 - Auditoria de mudancas de estado das ordens.
 - Funcoes `get_best_orders`, `cancel_order` e `user_portfolio`.
 - Views `view_market_summary`, `view_trades_history` e `view_traders_ranking`.
+
+## Usando o dump diretamente
+
+```bash
+psql -h localhost -p 5433 -U postgres -d banco_trabalho -f dump_banco.sql
+```
 
 ## Consultas uteis
 
