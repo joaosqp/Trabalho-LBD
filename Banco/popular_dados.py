@@ -76,7 +76,7 @@ def preparar_dados_iniciais():
         """
         SELECT id
         FROM usuarios
-        WHERE nome LIKE 'Trader %'
+        WHERE nome LIKE 'Trader %%'
         ORDER BY id
         LIMIT %s
         """,

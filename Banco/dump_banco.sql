@@ -102,15 +102,15 @@ BEGIN
 
     IF NEW.tipo = 'BID' THEN
         UPDATE carteiras
-        SET saldo_disponivel = saldo_disponivel - (NEW.preco * NEW.quantidade_total),
-            saldo_bloqueado = saldo_bloqueado + (NEW.preco * NEW.quantidade_total)
+        SET saldo_disponivel = GREATEST(ROUND(saldo_disponivel - (NEW.preco * NEW.quantidade_total), 8), 0.00000000),
+            saldo_bloqueado = GREATEST(ROUND(saldo_bloqueado + (NEW.preco * NEW.quantidade_total), 8), 0.00000000)
         WHERE usuario_id = NEW.usuario_id
           AND ativo_id = 'BRL'
           AND saldo_disponivel >= (NEW.preco * NEW.quantidade_total);
     ELSE
         UPDATE carteiras
-        SET saldo_disponivel = saldo_disponivel - NEW.quantidade_total,
-            saldo_bloqueado = saldo_bloqueado + NEW.quantidade_total
+        SET saldo_disponivel = GREATEST(ROUND(saldo_disponivel - NEW.quantidade_total, 8), 0.00000000),
+            saldo_bloqueado = GREATEST(ROUND(saldo_bloqueado + NEW.quantidade_total, 8), 0.00000000)
         WHERE usuario_id = NEW.usuario_id
           AND ativo_id = NEW.ativo_base_id
           AND saldo_disponivel >= NEW.quantidade_total;
@@ -232,8 +232,8 @@ BEGIN
             ordem_venda := oposta.id;
 
             UPDATE carteiras
-            SET saldo_bloqueado = saldo_bloqueado - (entrada.preco * qtd),
-                saldo_disponivel = saldo_disponivel + ((entrada.preco - oposta.preco) * qtd)
+            SET saldo_bloqueado = GREATEST(ROUND(saldo_bloqueado - (entrada.preco * qtd), 8), 0.00000000),
+                saldo_disponivel = GREATEST(ROUND(saldo_disponivel + ((entrada.preco - oposta.preco) * qtd), 8), 0.00000000)
             WHERE usuario_id = comprador AND ativo_id = 'BRL';
         ELSE
             comprador := oposta.usuario_id;
@@ -242,23 +242,23 @@ BEGIN
             ordem_venda := entrada.id;
 
             UPDATE carteiras
-            SET saldo_bloqueado = saldo_bloqueado - valor
+            SET saldo_bloqueado = GREATEST(ROUND(saldo_bloqueado - valor, 8), 0.00000000)
             WHERE usuario_id = comprador AND ativo_id = 'BRL';
         END IF;
 
         UPDATE carteiras
-        SET saldo_bloqueado = saldo_bloqueado - qtd
+        SET saldo_bloqueado = GREATEST(ROUND(saldo_bloqueado - qtd, 8), 0.00000000)
         WHERE usuario_id = vendedor AND ativo_id = entrada.ativo_base_id;
 
         INSERT INTO carteiras (usuario_id, ativo_id, saldo_disponivel)
-        VALUES (comprador, entrada.ativo_base_id, qtd)
+        VALUES (comprador, entrada.ativo_base_id, ROUND(qtd, 8))
         ON CONFLICT (usuario_id, ativo_id) DO UPDATE
-        SET saldo_disponivel = carteiras.saldo_disponivel + EXCLUDED.saldo_disponivel;
+        SET saldo_disponivel = GREATEST(ROUND(carteiras.saldo_disponivel + EXCLUDED.saldo_disponivel, 8), 0.00000000);
 
         INSERT INTO carteiras (usuario_id, ativo_id, saldo_disponivel)
-        VALUES (vendedor, 'BRL', valor)
+        VALUES (vendedor, 'BRL', ROUND(valor, 8))
         ON CONFLICT (usuario_id, ativo_id) DO UPDATE
-        SET saldo_disponivel = carteiras.saldo_disponivel + EXCLUDED.saldo_disponivel;
+        SET saldo_disponivel = GREATEST(ROUND(carteiras.saldo_disponivel + EXCLUDED.saldo_disponivel, 8), 0.00000000);
 
         UPDATE ordens
         SET quantidade_preenchida = quantidade_preenchida + qtd,
@@ -346,13 +346,13 @@ BEGIN
 
     IF ordem.tipo = 'BID' THEN
         UPDATE carteiras
-        SET saldo_disponivel = saldo_disponivel + (ordem.preco * restante),
-            saldo_bloqueado = saldo_bloqueado - (ordem.preco * restante)
+        SET saldo_disponivel = GREATEST(ROUND(saldo_disponivel + (ordem.preco * restante), 8), 0.00000000),
+            saldo_bloqueado = GREATEST(ROUND(saldo_bloqueado - (ordem.preco * restante), 8), 0.00000000)
         WHERE usuario_id = ordem.usuario_id AND ativo_id = 'BRL';
     ELSE
         UPDATE carteiras
-        SET saldo_disponivel = saldo_disponivel + restante,
-            saldo_bloqueado = saldo_bloqueado - restante
+        SET saldo_disponivel = GREATEST(ROUND(saldo_disponivel + restante, 8), 0.00000000),
+            saldo_bloqueado = GREATEST(ROUND(saldo_bloqueado - restante, 8), 0.00000000)
         WHERE usuario_id = ordem.usuario_id AND ativo_id = ordem.ativo_base_id;
     END IF;
 
